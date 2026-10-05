@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cong. Lake Shore — Gabbai Texts</title>
+<link rel="icon" href="/logo.png">
+<style>
+  :root{
+    --green:#1f4d3a; --green-dark:#173a2c; --green-light:#eaf1ee;
+    --gold:#c8a24a; --ink:#1c2321; --muted:#6b7a74;
+    --line:#dde5e1; --bg:#f4f1ea; --white:#fff; --danger:#b23b3b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5}
+  img{max-width:100%}
+  .hidden{display:none!important}
+
+  /* login */
+  #login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+  .login-card{background:var(--white);border:1px solid var(--line);border-radius:16px;
+    padding:28px 24px;width:100%;max-width:380px;box-shadow:0 8px 30px rgba(0,0,0,.06);text-align:center}
+  .login-card .logo{margin-bottom:18px}
+  .login-card h1{font-size:19px;margin:0 0 2px;color:var(--green-dark)}
+  .login-card p.sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+
+  .pw-wrap{position:relative;margin-bottom:12px}
+  .pw-wrap input{width:100%;padding:13px 44px 13px 14px;border:1px solid var(--line);
+    border-radius:10px;font-size:16px}
+  .pw-eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    background:none;border:none;cursor:pointer;padding:6px;color:var(--muted);line-height:0}
+  .pw-eye svg{width:22px;height:22px}
+
+  button.primary{width:100%;background:var(--green);color:#fff;border:none;border-radius:10px;
+    padding:13px;font-size:16px;font-weight:600;cursor:pointer}
+  button.primary:hover{background:var(--green-dark)}
+  .err{color:var(--danger);font-size:14px;margin-top:10px;min-height:18px}
+
+  /* app shell */
+  header.bar{background:var(--white);border-bottom:1px solid var(--line);padding:10px 16px;
+    display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
+  header.bar .logo{height:46px}
+  header.bar .spacer{flex:1}
+  header.bar .role-tag{font-size:12px;color:var(--muted);background:var(--green-light);
+    padding:4px 10px;border-radius:999px}
+  header.bar button.link{background:none;border:none;color:var(--green);cursor:pointer;font-size:14px}
+
+  nav.tabs{display:flex;gap:4px;background:var(--white);border-bottom:1px solid var(--line);
+    padding:0 12px;overflow-x:auto}
+  nav.tabs button{background:none;border:none;padding:12px 14px;font-size:15px;color:var(--muted);
+    cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+  nav.tabs button.active{color:var(--green-dark);border-bottom-color:var(--green);font-weight:600}
+
+  main{max-width:760px;margin:0 auto;padding:18px 16px 60px}
+  .panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  h2{font-size:17px;margin:0 0 12px;color:var(--green-dark)}
+  h3{font-size:15px;margin:18px 0 10px;color:var(--green-dark)}
+  label.fld{display:block;font-size:13px;color:var(--muted);margin:0 0 6px}
+  textarea,input.text,select.text{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fff}
+  textarea{min-height:110px;resize:vertical}
+  .count{font-size:13px;color:var(--muted);margin-top:6px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px 16px;
+    font-size:15px;font-weight:600;cursor:pointer}
+  .btn:hover{background:var(--green-dark)}
+  .btn.sm{padding:7px 12px;font-size:13px}
+  .btn.ghost{background:#fff;color:var(--green);border:1px solid var(--green)}
+  .btn.danger{background:var(--danger)}
+  .btn.danger:hover{background:#8f2e2e}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .toast-wrap{position:fixed;left:24px;bottom:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+  .toast{background:#323232;color:#fff;font-size:14px;padding:12px 16px;border-radius:6px;box-shadow:0 3px 10px rgba(0,0,0,.3);display:flex;align-items:center;gap:18px;min-width:240px;max-width:420px;animation:toastIn .2s ease}
+  .toast.bad{background:#8a1f1f}
+  .toast button{background:none;border:none;color:#8ab4f8;font-weight:700;font-size:14px;cursor:pointer;padding:0}
+  .toast .x{color:#bbb;font-weight:400;margin-left:auto}
+  @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .note{font-size:13px;padding:10px 12px;border-radius:8px;margin-top:12px}
+  .note.ok{background:#e7f3ec;color:#1f6b42}
+  .note.bad{background:#fbeaea;color:var(--danger)}
+
+  /* members */
+  .members-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .members-toolbar .spacer{flex:1}
+  .m-list{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .m-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .m-row:last-child{border-bottom:none}
+  .m-row:nth-child(even){background:#fafcfb}
+  .m-row input[type=checkbox]{width:18px;height:18px;flex:0 0 auto}
+  .m-name{flex:1;min-width:0}
+  .m-name .nm{font-weight:600;font-size:15px}
+  .m-name .ph{font-size:13px;color:var(--muted)}
+  .m-name .grp{font-size:12px;color:var(--green);margin-top:2px}
+  .m-name input.text{padding:7px 10px;font-size:14px}
+  .selbar{background:var(--green-light);border:1px solid #cfe0d7;border-radius:10px;
+    padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+  .selbar .spacer{flex:1}
+  .selbar b{color:var(--green-dark)}
+
+  .reply-row,.log-row{padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;position:relative}
+  .reply-row .ph,.log-row .meta{font-size:12px;color:var(--muted);margin-bottom:4px}
+  .file-hint{font-size:13px;color:var(--muted);margin-top:6px}
+  .checkline{display:flex;align-items:center;gap:8px;font-size:14px;margin-top:12px}
+
+  /* history card + kebab menu */
+  .log-row .body-txt{white-space:pre-wrap}
+  .kebab-wrap{position:absolute;top:8px;right:8px}
+  .kebab{background:none;border:none;font-size:20px;line-height:1;cursor:pointer;color:var(--muted);padding:4px 8px;border-radius:6px}
+  .kebab:hover{background:var(--green-light)}
+  .kebab-menu{position:absolute;right:0;top:34px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:10;min-width:150px;overflow:hidden}
+  .kebab-menu button{display:block;width:100%;text-align:left;background:none;border:none;
+    padding:10px 14px;font-size:14px;cursor:pointer;color:var(--ink)}
+  .kebab-menu button:hover{background:var(--green-light)}
+  .kebab-menu button.danger{color:var(--danger)}
+  .thumb{max-height:80px;border-radius:8px;margin-top:8px;display:block}
+
+  /* attach preview */
+  .attach-pill{display:inline-flex;align-items:center;gap:8px;background:var(--green-light);
+    border:1px solid #cfe0d7;border-radius:999px;padding:5px 12px;font-size:13px;margin-top:10px}
+  .attach-pill button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:15px;line-height:1}
+
+  /* schedule picker */
+  .sched-box{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:10px;background:#fafcfb}
+  .sched-box .row{margin-bottom:0}
+  .subtabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .subtabs button{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px;
+    font-size:14px;cursor:pointer;color:var(--muted)}
+  .subtabs button.active{background:var(--green);color:#fff;border-color:var(--green);font-weight:600}
+  .chip{display:inline-block;background:var(--green-light);color:var(--green-dark);border-radius:999px;
+    padding:2px 10px;font-size:12px;margin:2px 4px 2px 0}
+
+  /* replies conversations */
+  .thread{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+  .thread-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .thread-head .nm{font-weight:600}
+  .thread-head .ph{font-size:13px;color:var(--muted)}
+  .thread-head .spacer{flex:1}
+  .bubble{max-width:85%;padding:8px 12px;border-radius:12px;margin:4px 0;white-space:pre-wrap;font-size:15px}
+  .bubble.in{background:#f0f2f1}
+  .bubble.out{background:var(--green-light);margin-left:auto}
+  .bubble .t{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+  .thread textarea{min-height:60px;margin-top:8px}
+  textarea:disabled,input.text:disabled{background:#f6f7f6;color:var(--ink);opacity:1}
+  .badge{display:inline-block;background:var(--danger);color:#fff;border-radius:999px;font-size:11px;font-weight:700;
+    min-width:18px;padding:1px 6px;margin-left:6px;line-height:16px;text-align:center}
+  .thread.open{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger) inset}
+  .thread.done{opacity:.75}
+  .chip.new{background:#fbeaea;color:var(--danger);font-weight:600}
+  .chip.ok{background:#e7f3ec;color:#1f6b42}
+  .set-help{font-size:12px;color:var(--muted);margin:4px 0 14px}
+  #mnDetails summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px}
+  #mnDetails summary::-webkit-details-marker{display:none}
+  #mnDetails summary::before{content:'\25B8';display:inline-block;width:14px;color:var(--muted)}
+  #mnDetails[open] summary::before{content:'\25BE'}
+  .sched-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eee;flex-wrap:wrap}
+  .sched-row:last-child{border-bottom:none}
+  #tourOverlay{position:fixed;inset:0;background:rgba(15,20,15,.55);z-index:9998;display:none}
+  #tourOverlay.show{display:block}
+  .tour-highlight{position:relative;z-index:9999;box-shadow:0 0 0 4px var(--green);border-radius:8px;background:#fff}
+  #tourBox{position:fixed;z-index:10000;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.35);
+    padding:16px;width:280px;display:none}
+  #tourBox.show{display:block}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="login">
+  <div class="login-card">
+    <img class="logo" src="/logo.png" alt="Congregation Lake Shore">
+    <h1>Gabbai Text Messaging</h1>
+    <p class="sub">Sign in to send announcements</p>
+    <div class="pw-wrap">
+      <input id="pw" type="password" placeholder="Password" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="pw-eye" type="button" onclick="togglePw()" aria-label="Show password">
+        <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+    <button class="primary" onclick="doLogin()">Sign in</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <header class="bar">
+    <img class="logo" src="/logo.png" alt="Congregation Lake Shore">
+    <div class="spacer"></div>
+    <span class="role-tag" id="roleTag"></span>
+    <button class="btn sm ghost" onclick="startTour()">? Take a tour</button>
+    <button class="btn sm danger" onclick="logout()">Sign out</button>
+  </header>
+
+  <div id="tourOverlay"></div>
+  <div id="tourBox"></div>
+
+  <nav class="tabs">
+    <button id="tab-send" class="active" onclick="showTab('send')">Send</button>
+    <button id="tab-history" onclick="showTab('history')">History</button>
+    <button id="tab-members" onclick="showTab('members')">Members</button>
+    <button id="tab-replies" onclick="showTab('replies')">Replies<span id="replyBadge" class="badge hidden"></span></button>
+    <button id="tab-times" onclick="showTab('times')">Times</button>
+    <button id="tab-settings" class="hidden" onclick="showTab('settings')">Settings</button>
+  </nav>
+
+  <main>
+    <!-- SEND -->
+    <section id="view-send">
+      <div class="panel">
+        <h2>Send a message</h2>
+        <label class="fld" for="msg">Message</label>
+        <textarea id="msg" placeholder="e.g. Mincha today at 1:45 in the main shul." oninput="updateCount()"></textarea>
+        <div class="count"><span id="charCount">0</span> characters</div>
+
+        <!-- photo attach -->
+        <div class="row" style="margin-top:10px">
+          <label class="btn sm ghost" style="cursor:pointer">
+            📷 Attach photo
+            <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhoto(event)">
+          </label>
+          <span class="count" id="photoStatus"></span>
+        </div>
+        <div id="attachPreview"></div>
+
+        <!-- who to send to -->
+        <label class="fld" for="targetSelect" style="margin-top:16px">Send to</label>
+        <select id="targetSelect" class="text" onchange="onTargetChange()">
+          <option value="all">Everyone</option>
+          <option value="group">A group…</option>
+          <option value="pick">Only some members…</option>
+        </select>
+
+        <div id="groupPickWrap" class="hidden" style="margin-top:10px">
+          <select id="groupSelect" class="text" onchange="updateSendLabel()"></select>
+        </div>
+
+        <div id="sendPicker" class="hidden" style="margin-top:12px">
+          <div class="members-toolbar">
+            <button class="btn sm ghost" onclick="pickAll(true)">Select all</button>
+            <button class="btn sm ghost" onclick="pickAll(false)">Clear</button>
+            <div class="spacer"></div>
+            <span class="count"><span id="pickCount">0</span> selected</span>
+          </div>
+          <div class="m-list" id="sendList"></div>
+        </div>
+
+        <!-- schedule choice -->
+        <div class="checkline" style="margin-top:16px">
+          <input type="checkbox" id="scheduleToggle" onchange="toggleSchedule()">
+          <label for="scheduleToggle">Schedule for later</label>
+        </div>
+        <div id="schedBox" class="sched-box hidden">
+          <div class="row">
+            <div style="flex:1;min-width:130px">
+              <label class="fld" for="schedDay">Day</label>
+              <select id="schedDay" class="text"></select>
+            </div>
+            <div style="flex:1;min-width:110px">
+              <label class="fld" for="schedTime">Time</label>
+              <input type="time" id="schedTime" class="text" value="13:45">
+            </div>
+          </div>
+          <div class="count" id="schedPreview" style="margin-top:8px"></div>
+        </div>
+
+        <div class="row" style="margin-top:16px">
+          <button class="btn" id="sendBtn" onclick="sendMessage()">Send now</button>
+          <span class="count" id="sendTargetLabel">Will send to everyone</span>
+        </div>
+        <div id="sendNote"></div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="view-history" class="hidden">
+      <div class="panel">
+        <h2>Message history</h2>
+        <div class="subtabs">
+          <button id="sub-history" class="active" onclick="showHistorySub('history')">History</button>
+          <button id="sub-scheduled" onclick="showHistorySub('scheduled')">Scheduled</button>
+          <button id="sub-archive" onclick="showHistorySub('archive')">Archive</button>
+        </div>
+        <div id="historyList"></div>
+        <div id="scheduledList" class="hidden"></div>
+        <div id="archiveList" class="hidden"></div>
+      </div>
+    </section>
+
+    <!-- MEMBERS -->
+    <section id="view-members" class="hidden">
+      <div class="panel">
+        <h2>Members (<span id="memCount">0</span>)</h2>
+
+        <div id="adminMemberTools">
+          <div class="members-toolbar">
+            <button class="btn sm ghost" onclick="checkAll(true)">Select all</button>
+            <button class="btn sm ghost" onclick="checkAll(false)">Clear</button>
+            <div class="spacer"></div>
+            <label class="btn sm ghost" style="cursor:pointer">
+              Upload Excel/CSV
+              <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" class="hidden" onchange="handleFile(event)">
+            </label>
+            <button class="btn sm" onclick="showAddOne()">Add one</button>
+          </div>
+
+          <div id="addOneRow" class="hidden" style="margin-bottom:12px">
+            <div class="row">
+              <input class="text" id="addName" placeholder="Name" style="flex:1;min-width:120px">
+              <input class="text" id="addPhone" type="tel" placeholder="(845) 555-1234" oninput="this.value=typePhone(this.value)" onblur="this.value=fmtPhone(this.value)" style="flex:1;min-width:120px">
+              <button class="btn sm" onclick="addOne()">Add</button>
+            </div>
+          </div>
+
+          <div id="selBar" class="selbar hidden">
+            <b id="selCount">0</b><span>selected</span>
+            <div class="spacer"></div>
+            <select id="bulkGroupSelect" class="text" style="width:auto;min-width:130px"></select>
+            <button class="btn sm ghost" onclick="assignSelectedToGroup()">Add to group</button>
+            <button class="btn sm danger" onclick="removeSelected()">Remove selected</button>
+          </div>
+        </div>
+
+        <div class="m-list" id="memberList"></div>
+        <div id="memberNote"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Groups</h2>
+        <p class="count" style="margin-top:-6px">Create groups, then tag members so you can text just that group.</p>
+        <div class="row">
+          <input class="text" id="newGroupName" placeholder="New group name" style="flex:1;min-width:160px">
+          <button class="btn" onclick="addGroup()">Add group</button>
+        </div>
+        <div id="groupList" style="margin-top:12px"></div>
+        <div id="groupNote"></div>
+      </div>
+    </section>
+
+    <!-- REPLIES -->
+    <section id="view-replies" class="hidden">
+      <div class="panel">
+        <div class="row" style="margin-bottom:6px"><h2 style="margin:0;flex:1">Messages from members</h2>
+          <button class="btn sm ghost" onclick="loadReplies()">Refresh</button></div>
+        <p class="count" style="margin-top:0">Members text <b>REPLY: their message</b> to the shul number. Answer here, or the gabbai can answer by text from his phone.</p>
+        <div id="replyList"></div>
+      </div>
+    </section>
+
+    <!-- TIMES (gabbai) -->
+    <section id="view-times" class="hidden">
+      <div class="panel" id="timesBox">
+        <div class="row" style="margin-bottom:6px"><h2 style="margin:0;flex:1">Davening times (TIMES)</h2>
+          <button class="btn sm ghost lk-edit" onclick="lockBox('timesBox',false)">Edit</button></div>
+        <label class="checkline" style="margin:0 0 6px"><input type="checkbox" id="set-timesEnabled" onchange="showTimesOn()"> <b>TIMES is on</b> (members who text TIMES get today's times)</label>
+        <div id="timesOffBox" class="hidden">
+          <label class="fld">When TIMES is off, send</label>
+          <textarea id="set-timesOffText" style="min-height:60px"></textarea>
+        </div>
+        <div id="timesOnBox">
+        <label class="fld" style="margin-top:10px">How is Mincha set?</label>
+        <div class="row" style="margin-bottom:10px">
+          <label class="checkline" style="margin:0"><input type="radio" name="tmode" value="auto" id="tmode-auto" onchange="showTimeMode()"> Automatic from zmanim</label>
+          <label class="checkline" style="margin:0"><input type="radio" name="tmode" value="fixed" id="tmode-fixed" onchange="showTimeMode()"> I set the time</label>
+        </div>
+        <div id="tm-auto">
+          <label class="fld">Mincha - minutes before Rabbeinu Tam</label>
+          <input class="text" id="set-minchaMinutesBefore" type="number" min="0" max="120" style="max-width:160px">
+          <div class="set-help">Maariv = Rabbeinu Tam (72 min after shkia). Times change every day on their own.</div>
+        </div>
+        <div id="tm-fixed" class="hidden">
+          <div class="row">
+            <div style="flex:1;min-width:140px"><label class="fld">Mincha</label><input class="text" id="set-fixedMincha" type="time"></div>
+            <div style="flex:1;min-width:140px"><label class="fld">Maariv (time, or leave empty = "right after Mincha")</label><input class="text" id="set-fixedMaariv" placeholder="right after Mincha"></div>
+          </div>
+          <div class="set-help">The same time is sent every day until you change it.</div>
+        </div>
+        <label class="fld" style="margin-top:12px">TIMES reply ({mincha} and {maariv} are filled in automatically)</label>
+        <textarea id="set-timesText"></textarea>
+        <label class="fld" style="margin-top:12px">If times can't be loaded, send</label>
+        <textarea id="set-timesFallbackText" style="min-height:60px"></textarea>
+        </div>
+        <div class="row lk-save hidden" style="margin-top:12px">
+          <button class="btn" onclick="saveTimes()">Save</button>
+          <button class="btn ghost" onclick="loadSettingsForm()">Cancel</button>
+        </div>
+        <div id="timesNote"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Special message for a day</h2>
+        <p class="count" style="margin-top:-6px">For a day that's different (early Mincha, Erev Yom Tov...). On that day, TIMES sends this message instead. It's removed by itself after the day passes.</p>
+        <div class="row">
+          <div style="min-width:150px"><label class="fld">Date</label><input class="text" id="spDate" type="date"></div>
+        </div>
+        <label class="fld" style="margin-top:10px">Message</label>
+        <textarea id="spText" style="min-height:70px" placeholder="Cong. Lake Shore - today Mincha is early at 5:30 PM, Maariv right after."></textarea>
+        <button class="btn" style="margin-top:10px" onclick="addSpecial()">Add</button>
+        <div id="spList" style="margin-top:14px"></div>
+        <div id="spNote"></div>
+      </div>
+      <div class="panel">
+        <details id="mnDetails">
+        <summary>
+          <h2 style="margin:0;flex:1;display:inline">Minyan count</h2>
+          <label class="checkline" style="margin:0" onclick="event.stopPropagation()">
+            <input type="checkbox" id="mnEnabled" onclick="event.stopPropagation()" onchange="postSettings({minyanEnabled:this.checked},'mnNote')"> <b>Auto-schedule is on</b>
+          </label>
+        </summary>
+        <div style="margin-top:12px">
+        <p class="count" style="margin-top:-6px">Text "Who is coming to Shacharis / Mincha / Maariv?". Members answer ME, YES, X2, X3 (or NO). When the count reaches the goal, everyone who was asked gets a text that there is a minyan. One count runs at a time; it closes when you stop it, start a new one, or after 18 hours.</p>
+        <div id="mnStatus"></div>
+        <div id="mnStart">
+          <div class="row" style="margin-bottom:10px">
+            <div style="flex:1;min-width:130px"><label class="fld">Davening</label>
+              <select class="text" id="mnTefila"><option>Shacharis</option><option selected>Mincha</option><option>Maariv</option></select></div>
+            <div style="flex:1;min-width:130px"><label class="fld">For date</label>
+              <input class="text" id="mnDate" type="date"></div>
+          </div>
+          <div class="row">
+            <div style="flex:1;min-width:150px"><label class="fld">Send to</label>
+              <select class="text" id="mnGroup"></select></div>
+            <div style="width:120px"><label class="fld">People needed</label>
+              <input class="text" id="mnGoal" type="number" min="1" max="100"></div>
+          </div>
+          <div class="set-help" style="margin:8px 0 0">In the texts below, {tefila} and {when} are filled in (like "Shacharis tomorrow").</div>
+          <label class="fld" style="margin-top:10px">Question text</label>
+          <textarea id="mnAsk" style="min-height:70px"></textarea>
+          <label class="checkline"><input type="checkbox" id="mnSendThanks" onchange="document.getElementById('mnThanksBox').classList.toggle('hidden',!this.checked);postSettings({minyanSendThanks:this.checked},'mnNote')"> Reply to each person with the count so far</label>
+          <div id="mnThanksBox">
+            <label class="fld" style="margin-top:10px">Count reply ({count} and {goal} are filled in)</label>
+            <textarea id="mnThanks" style="min-height:50px"></textarea>
+          </div>
+          <label class="fld" style="margin-top:10px">"We have a minyan" text</label>
+          <textarea id="mnConfirm" style="min-height:50px"></textarea>
+          <button class="btn" style="margin-top:12px" onclick="startMinyan()">Start count &amp; send question</button>
+        </div>
+
+        <div class="panel" style="margin-top:18px;background:#f9f9f7">
+          <h3 style="margin:0 0 4px">Auto-schedule</h3>
+          <p class="count" style="margin-top:-2px">When "Auto-schedule is on" above, once a day (around 7 AM) the system checks these date ranges and automatically sends the count for any that include today - as long as nothing is already running and it hasn't already sent one today.</p>
+          <div id="mnSchedList"></div>
+          <div class="row" style="margin-top:10px">
+            <div style="flex:1;min-width:120px"><label class="fld">Davening</label>
+              <select class="text" id="mnSchedTefila"><option>Shacharis</option><option selected>Mincha</option><option>Maariv</option></select></div>
+            <div style="min-width:140px"><label class="fld">From date</label><input class="text" id="mnSchedStart" type="date"></div>
+            <div style="min-width:140px"><label class="fld">To date</label><input class="text" id="mnSchedEnd" type="date"></div>
+            <div style="flex:1;min-width:150px"><label class="fld">Send to</label><select class="text" id="mnSchedGroup"></select></div>
+          </div>
+          <button class="btn sm" style="margin-top:10px" onclick="addMinyanSchedule()">Add schedule</button>
+        </div>
+        <div id="mnNote"></div>
+        </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- SETTINGS (admin) -->
+    <section id="view-settings" class="hidden">
+      <div id="settingsBox">
+        <div class="panel">
+          <div class="row" style="margin-bottom:6px"><h2 style="margin:0;flex:1">Gabbai</h2>
+            <button class="btn sm ghost lk-edit" onclick="lockBox('settingsBox',false)">Edit</button></div>
+          <label class="fld">Gabbai's cell number</label>
+          <input class="text" id="set-gabbaiNumber" placeholder="845-555-1234">
+          <div class="set-help">REPLY messages are texted to this number. The gabbai answers by texting back (goes to the last member), or <b>#1234 message</b> to answer a specific member.</div>
+          <label class="checkline"><input type="checkbox" id="set-forwardToGabbai"> Text REPLY messages to the gabbai's phone (they always show on the Replies tab)</label>
+          <label class="fld" style="margin-top:12px">Zip code for zmanim</label>
+          <input class="text" id="set-timesZip" style="max-width:160px">
+        </div>
+
+        <div class="panel">
+          <h2>Auto-replies</h2>
+          <label class="fld">Menu (sent for any other text)</label>
+          <textarea id="set-menuText" style="min-height:170px"></textarea>
+          <label class="fld" style="margin-top:12px">DONATE</label>
+          <textarea id="set-donateText" style="min-height:70px"></textarea>
+          <label class="fld" style="margin-top:12px">CONTACT</label>
+          <textarea id="set-contactText" style="min-height:100px"></textarea>
+          <label class="fld" style="margin-top:12px">JOIN</label>
+          <textarea id="set-joinText" style="min-height:80px"></textarea>
+          <label class="fld" style="margin-top:12px">After a member sends a REPLY message</label>
+          <textarea id="set-replyConfirmText" style="min-height:50px"></textarea>
+          <div class="set-help" style="margin-top:10px">Members can write REPLY: or just R (like "R can I get an aliyah?"). Texting only REPLY or R means their next text goes to the gabbai. STOP, START and HELP replies are sent by Twilio automatically.</div>
+        </div>
+
+        <div class="row lk-save hidden" style="margin-bottom:16px">
+          <button class="btn" onclick="saveSettingsForm()">Save settings</button>
+          <button class="btn ghost" onclick="loadSettingsForm()">Cancel</button>
+        </div>
+        <div id="settingsNote"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Change gabbai password</h2>
+        <div class="row">
+          <input class="text" id="newGabbaiPw" placeholder="New gabbai password" style="flex:1;min-width:160px">
+          <button class="btn" onclick="changeGabbaiPw()">Update</button>
+        </div>
+        <div id="adminNote"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+let PW=null, ROLE=null, MEMBERS=[], GROUPS=[], attachedImageUrl=null;
+
+/* ---------- login ---------- */
+function togglePw(){
+  const i=document.getElementById('pw');
+  i.type = i.type==='password' ? 'text' : 'password';
+}
+async function doLogin(){
+  const pw=document.getElementById('pw').value.trim();
+  const err=document.getElementById('loginErr'); err.textContent='';
+  if(!pw){err.textContent='Enter your password.';return;}
+  const ok=await tryLogin(pw);
+  if(!ok){err.textContent=LAST_LOGIN_ERROR||'Wrong password.';}
+}
+let LAST_LOGIN_ERROR='';
+async function tryLogin(pw){
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({password:pw})});
+    const d=await r.json();
+    if(!d.ok){LAST_LOGIN_ERROR=d.error||'Wrong password.';return false;}
+    PW=pw; ROLE=d.role;
+    try{localStorage.setItem('slPw',pw);}catch(e){}
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    document.getElementById('roleTag').textContent = ROLE==='admin'?'Admin':'Gabbai';
+    if(ROLE==='admin'){
+      // Admin: only the Settings tab
+      ['send','history','members','replies','times'].forEach(x=>document.getElementById('tab-'+x).classList.add('hidden'));
+      document.getElementById('tab-settings').classList.remove('hidden');
+      showTab('settings');
+      return true;
+    }
+    document.getElementById('adminMemberTools').style.display = 'block';
+    buildScheduleDays();
+    showTab('send');
+    refreshReplyBadge(); setInterval(refreshReplyBadge, 60000);
+    loadGroups();
+    loadMembers();
+    return true;
+  }catch(e){LAST_LOGIN_ERROR='Something went wrong. Try again.';return false;}
+}
+async function tryAutoLogin(){
+  let saved=null;
+  try{saved=localStorage.getItem('slPw');}catch(e){}
+  if(!saved)return;
+  await tryLogin(saved);
+}
+function logout(){PW=null;ROLE=null;try{localStorage.removeItem('slPw');}catch(e){}location.reload();}
+
+/* ---------- guided tour ---------- */
+const TOUR_STEPS_GABBAI=[
+  {id:'tab-send',title:'Send',text:'Send a text to everyone, or just one group. You can attach a photo too.'},
+  {id:'tab-history',title:'History',text:'See every message that has gone out, and anything scheduled for later.'},
+  {id:'tab-members',title:'Members',text:'Add, edit or remove members, and organize them into groups.'},
+  {id:'tab-replies',title:'Replies',text:'Messages members send back to the gabbai show up here \u2014 answer them right from here.'},
+  {id:'tab-times',title:'Times',text:'Set davening times, special-day messages, and run a minyan count.'},
+];
+const TOUR_STEPS_ADMIN=[
+  {id:'tab-settings',title:'Settings',text:'Update the shul\'s info, the texts members receive, and the gabbai password.'},
+];
+let TOUR_I=0, TOUR_ACTIVE=null;
+function tourSteps(){return ROLE==='admin'?TOUR_STEPS_ADMIN:TOUR_STEPS_GABBAI;}
+function startTour(){TOUR_I=0;showTourStep();}
+function endTour(){
+  if(TOUR_ACTIVE){const el=document.getElementById(TOUR_ACTIVE);if(el)el.classList.remove('tour-highlight');}
+  TOUR_ACTIVE=null;
+  document.getElementById('tourBox').classList.remove('show');
+  document.getElementById('tourOverlay').classList.remove('show');
+}
+function showTourStep(){
+  const steps=tourSteps();
+  if(TOUR_I<0||TOUR_I>=steps.length){endTour();return;}
+  const step=steps[TOUR_I];
+  if(TOUR_ACTIVE){const prev=document.getElementById(TOUR_ACTIVE);if(prev)prev.classList.remove('tour-highlight');}
+  const el=document.getElementById(step.id);
+  if(!el||el.classList.contains('hidden')){TOUR_I++;showTourStep();return;}
+  showTab(step.id.replace('tab-',''));
+  el.classList.add('tour-highlight');
+  TOUR_ACTIVE=step.id;
+  document.getElementById('tourOverlay').classList.add('show');
+  const box=document.getElementById('tourBox');
+  box.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${esc(step.title)} <span class="count">(${TOUR_I+1}/${steps.length})</span></div>
+    <div style="margin-bottom:14px">${esc(step.text)}</div>
+    <div class="row">
+      ${TOUR_I>0?'<button class="btn sm ghost" onclick="tourBack()">Back</button>':''}
+      <span class="spacer"></span>
+      <button class="btn sm ghost" onclick="endTour()">Skip</button>
+      <button class="btn sm" onclick="tourNext()">${TOUR_I===steps.length-1?'Done':'Next'}</button>
+    </div>`;
+  box.classList.add('show');
+  requestAnimationFrame(()=>{
+    const r=el.getBoundingClientRect();
+    const bw=box.offsetWidth||280, bh=box.offsetHeight||120;
+    let top=r.bottom+12, left=r.left;
+    if(left+bw>window.innerWidth-12) left=Math.max(12,window.innerWidth-bw-12);
+    if(top+bh>window.innerHeight-12) top=Math.max(12,r.top-bh-12);
+    box.style.top=top+'px'; box.style.left=left+'px';
+  });
+}
+function tourNext(){TOUR_I++;showTourStep();}
+function tourBack(){TOUR_I--;showTourStep();}
+
+tryAutoLogin();
+
+function authHeaders(json){
+  const h={'x-gabbai-password':PW};
+  if(json) h['Content-Type']='application/json';
+  return h;
+}
+
+/* ---------- tabs ---------- */
+function showTab(t){
+  ['send','history','members','replies','times','settings'].forEach(x=>{
+    document.getElementById('view-'+x).classList.toggle('hidden', x!==t);
+    const tb=document.getElementById('tab-'+x);
+    if(tb) tb.classList.toggle('active', x===t);
+  });
+  if(t==='replies') loadReplies();
+  if(t==='settings'||t==='times') loadSettingsForm();
+  if(t==='times') loadMinyan();
+  if(t==='history') loadHistory();
+  if(t==='members'){renderMembers();renderGroupsAdmin();}
+  if(t==='send') onTargetChange();
+}
+
+/* ---------- send ---------- */
+function updateCount(){document.getElementById('charCount').textContent=document.getElementById('msg').value.length;}
+
+function onTargetChange(){
+  const v=document.getElementById('targetSelect').value;
+  document.getElementById('groupPickWrap').classList.toggle('hidden', v!=='group');
+  document.getElementById('sendPicker').classList.toggle('hidden', v!=='pick');
+  if(v==='group') fillGroupSelect();
+  if(v==='pick') renderSendList();
+  updateSendLabel();
+}
+function fillGroupSelect(){
+  const sel=document.getElementById('groupSelect');
+  sel.innerHTML = GROUPS.length
+    ? GROUPS.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')
+    : '<option value="">(no groups yet — create one in Admin)</option>';
+}
+function renderSendList(){
+  const el=document.getElementById('sendList');
+  el.innerHTML = MEMBERS.map((m,i)=>`
+    <div class="m-row">
+      <input type="checkbox" class="pick" data-ph="${esc(m.phone)}" onchange="updateSendLabel()">
+      <div class="m-name"><div class="nm">${esc(m.name)}</div><div class="ph">${esc(fmtPhone(m.phone))}</div></div>
+    </div>`).join('') || '<div class="m-row">No members yet.</div>';
+  updateSendLabel();
+}
+function pickAll(v){document.querySelectorAll('#sendList .pick').forEach(c=>c.checked=v);updateSendLabel();}
+function selectedSendPhones(){return [...document.querySelectorAll('#sendList .pick:checked')].map(c=>c.dataset.ph);}
+function updateSendLabel(){
+  const v=document.getElementById('targetSelect').value;
+  const lbl=document.getElementById('sendTargetLabel');
+  if(v==='all'){lbl.textContent='Will send to everyone';return;}
+  if(v==='group'){
+    const g=GROUPS.find(x=>x.id===document.getElementById('groupSelect').value);
+    lbl.textContent = g?`Will send to group: ${g.name}`:'Pick a group';return;
+  }
+  const n=selectedSendPhones().length;
+  document.getElementById('pickCount').textContent=n;
+  lbl.textContent = n?`Will send to ${n} selected`:'Select at least one';
+}
+
+/* photo attach */
+async function handlePhoto(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const status=document.getElementById('photoStatus');
+  status.textContent='Uploading photo…';
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    try{
+      const r=await fetch('/api/upload',{method:'POST',headers:authHeaders(true),
+        body:JSON.stringify({dataUrl:e.target.result,filename:f.name})});
+      const d=await r.json();
+      if(d.ok){
+        attachedImageUrl=d.url;
+        status.textContent='';
+        document.getElementById('attachPreview').innerHTML=
+          `<div class="attach-pill">📷 Photo attached <button onclick="clearPhoto()" title="Remove">✕</button></div>
+           <img class="thumb" src="${esc(d.url)}">`;
+      }else{status.textContent=d.error||'Upload failed.';}
+    }catch(err){status.textContent='Upload failed.';}
+    ev.target.value='';
+  };
+  reader.readAsDataURL(f);
+}
+function clearPhoto(){attachedImageUrl=null;document.getElementById('attachPreview').innerHTML='';document.getElementById('photoStatus').textContent='';}
+
+/* schedule */
+function buildScheduleDays(){
+  const sel=document.getElementById('schedDay');
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const now=new Date();
+  let html='';
+  for(let i=0;i<8;i++){
+    const d=new Date(now); d.setDate(now.getDate()+i);
+    let label;
+    if(i===0)label='Today';
+    else if(i===1)label='Tomorrow';
+    else label=days[d.getDay()]+' '+(d.getMonth()+1)+'/'+d.getDate();
+    html+=`<option value="${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}">${label}</option>`;
+  }
+  sel.innerHTML=html;
+}
+function toggleSchedule(){
+  const on=document.getElementById('scheduleToggle').checked;
+  document.getElementById('schedBox').classList.toggle('hidden',!on);
+  document.getElementById('sendBtn').textContent = on?'Schedule':'Send now';
+  if(on) updateSchedPreview();
+}
+function scheduledTimestamp(){
+  const dayVal=document.getElementById('schedDay').value;   // "Y-M-D"
+  const timeVal=document.getElementById('schedTime').value; // "HH:MM"
+  if(!dayVal||!timeVal)return null;
+  const [y,mo,da]=dayVal.split('-').map(Number);
+  const [h,mi]=timeVal.split(':').map(Number);
+  return new Date(y,mo-1,da,h,mi,0,0).getTime();
+}
+function updateSchedPreview(){
+  const ts=scheduledTimestamp();
+  const el=document.getElementById('schedPreview');
+  if(!ts){el.textContent='';return;}
+  el.textContent = 'Will send: '+new Date(ts).toLocaleString();
+}
+document.addEventListener('change',e=>{ if(e.target.id==='schedDay'||e.target.id==='schedTime') updateSchedPreview(); });
+
+async function sendMessage(){
+  const msg=document.getElementById('msg').value.trim();
+  const note=document.getElementById('sendNote'); note.innerHTML='';
+  if(!msg && !attachedImageUrl){note.innerHTML='<div class="note bad">Write a message or attach a photo.</div>';return;}
+
+  const v=document.getElementById('targetSelect').value;
+  const body={message:msg};
+  if(attachedImageUrl) body.mediaUrl=attachedImageUrl;
+
+  if(v==='group'){
+    const gid=document.getElementById('groupSelect').value;
+    if(!gid){note.innerHTML='<div class="note bad">Pick a group (or create one in Admin).</div>';return;}
+    body.groupId=gid;
+  }else if(v==='pick'){
+    const phones=selectedSendPhones();
+    if(!phones.length){note.innerHTML='<div class="note bad">Select at least one member.</div>';return;}
+    body.onlyPhones=phones;
+  }
+
+  const scheduled=document.getElementById('scheduleToggle').checked;
+  if(scheduled){
+    const ts=scheduledTimestamp();
+    if(!ts){note.innerHTML='<div class="note bad">Pick a day and time.</div>';return;}
+    if(ts < Date.now()){note.innerHTML='<div class="note bad">That time is in the past.</div>';return;}
+    body.runAt=ts;
+  }
+
+  const btn=document.getElementById('sendBtn'); btn.disabled=true;
+  if(!scheduled){
+    btn.textContent='Sending…';
+    const go = await undoCountdown('Sending in 5 seconds…');
+    if(!go){ showToast('Send cancelled.','ok'); btn.disabled=false; btn.textContent='Send now'; return; }
+  }else{ btn.textContent='Scheduling…'; }
+  try{
+    const r=await fetch('/api/send',{method:'POST',headers:authHeaders(true),body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!d.ok){note.innerHTML=`<div class="note bad">${esc(d.error||'Send failed.')}</div>`;}
+    else if(d.scheduled){
+      note.innerHTML=`<div class="note ok">Scheduled for ${new Date(d.runAt).toLocaleString()}.</div>`;
+      resetSendForm();
+    }else{
+      note.innerHTML=`<div class="note ok">Sent to ${d.sent} member${d.sent===1?'':'s'}${d.failedCount?`, ${d.failedCount} failed`:''}.</div>`;
+      resetSendForm();
+    }
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+  btn.disabled=false; btn.textContent=document.getElementById('scheduleToggle').checked?'Schedule':'Send now';
+}
+function resetSendForm(){
+  document.getElementById('msg').value=''; updateCount();
+  clearPhoto();
+  document.getElementById('scheduleToggle').checked=false; toggleSchedule();
+}
+
+/* ---------- history / archive / scheduled ---------- */
+let HISTORY=[], ARCHIVE=[], SCHEDULED=[];
+async function loadHistory(){
+  try{
+    const r=await fetch('/api/history',{headers:authHeaders()});
+    const d=await r.json();
+    if(d.ok){HISTORY=d.history||[];ARCHIVE=d.archive||[];SCHEDULED=d.scheduled||[];}
+  }catch(e){}
+  renderHistory();
+}
+function showHistorySub(s){
+  ['history','scheduled','archive'].forEach(x=>{
+    document.getElementById('sub-'+x).classList.toggle('active',x===s);
+    document.getElementById(x+'List').classList.toggle('hidden',x!==s);
+  });
+}
+function logCard(x, kind){
+  const menu = kind==='archive'
+    ? `<button onclick="reuse('${x.id}','archive')">Send again</button>
+       <button onclick="histAction('${x.id}','unarchive')">Unarchive</button>
+       <button class="danger" onclick="histAction('${x.id}','delete')">Delete</button>`
+    : `<button onclick="reuse('${x.id}','history')">Send again</button>
+       <button onclick="histAction('${x.id}','archive')">Archive</button>
+       <button class="danger" onclick="histAction('${x.id}','delete')">Delete</button>`;
+  const scope = x.scopeLabel || (x.scope==='selected'?'selected':x.scope==='group'?'group':'all');
+  return `<div class="log-row">
+    <div class="kebab-wrap">
+      <button class="kebab" onclick="toggleKebab(event,'k-${x.id}')">⋮</button>
+      <div class="kebab-menu hidden" id="k-${x.id}">${menu}</div>
+    </div>
+    <div class="meta">${when(x.at)} · ${esc(scope)} · sent ${x.sent}${x.failedCount?`, ${x.failedCount} failed`:''}${x.by?` · by ${esc(x.by)}`:''}</div>
+    <div class="body-txt">${x.message?esc(x.message):'<i>(photo only)</i>'}</div>
+    ${x.mediaUrl?`<img class="thumb" src="${esc(x.mediaUrl)}">`:''}
+  </div>`;
+}
+function renderHistory(){
+  document.getElementById('historyList').innerHTML =
+    HISTORY.map(x=>logCard(x,'history')).join('') || '<div class="count">No messages sent yet.</div>';
+  document.getElementById('archiveList').innerHTML =
+    ARCHIVE.map(x=>logCard(x,'archive')).join('') || '<div class="count">Nothing archived.</div>';
+  document.getElementById('scheduledList').innerHTML =
+    SCHEDULED.map(x=>`<div class="log-row" id="sched-${x.id}">
+      <div class="kebab-wrap">
+        <button class="kebab" onclick="toggleKebab(event,'s-${x.id}')">⋮</button>
+        <div class="kebab-menu hidden" id="s-${x.id}">
+          <button onclick="editScheduled('${x.id}')">Edit</button>
+          <button class="danger" onclick="histAction('${x.id}','cancelScheduled')">Cancel</button>
+        </div>
+      </div>
+      <div class="meta">⏰ ${when(x.runAt)}${x.by?` · by ${esc(x.by)}`:''}</div>
+      <div class="body-txt">${x.message?esc(x.message):'<i>(photo only)</i>'}</div>
+      ${x.mediaUrl?`<img class="thumb" src="${esc(x.mediaUrl)}">`:''}
+    </div>`).join('') || '<div class="count">Nothing scheduled.</div>';
+}
+function editScheduled(id){
+  const x=SCHEDULED.find(r=>r.id===id); if(!x)return;
+  const box=document.getElementById('sched-'+id);
+  const d=new Date(x.runAt);
+  const dateVal=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const timeVal=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  box.innerHTML=`
+    <label class="fld">Message</label>
+    <textarea id="edmsg-${id}" style="min-height:80px">${esc(x.message)}</textarea>
+    <div class="row" style="margin-top:8px">
+      <div style="flex:1;min-width:140px"><label class="fld">Date</label>
+        <input type="date" id="eddate-${id}" class="text" value="${dateVal}"></div>
+      <div style="flex:1;min-width:110px"><label class="fld">Time</label>
+        <input type="time" id="edtime-${id}" class="text" value="${timeVal}"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn sm" onclick="saveScheduled('${id}')">Save</button>
+      <button class="btn sm ghost" onclick="renderHistory()">Cancel</button>
+    </div>`;
+  document.getElementById('edmsg-'+id).focus();
+}
+async function saveScheduled(id){
+  const msg=document.getElementById('edmsg-'+id).value.trim();
+  const dateVal=document.getElementById('eddate-'+id).value;
+  const timeVal=document.getElementById('edtime-'+id).value;
+  if(!msg){alert('Write a message.');return;}
+  if(!dateVal||!timeVal){alert('Pick a date and time.');return;}
+  const [y,mo,da]=dateVal.split('-').map(Number);
+  const [h,mi]=timeVal.split(':').map(Number);
+  const runAt=new Date(y,mo-1,da,h,mi,0,0).getTime();
+  if(runAt < Date.now()){alert('That time is in the past.');return;}
+  try{
+    const r=await fetch('/api/history',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'editScheduled',id,message:msg,runAt})});
+    const d=await r.json();
+    if(d.ok){loadHistory();}
+    else{alert(d.error||'Could not save.');}
+  }catch(e){alert('Something went wrong.');}
+}
+function toggleKebab(ev,id){
+  ev.stopPropagation();
+  document.querySelectorAll('.kebab-menu').forEach(m=>{if(m.id!==id)m.classList.add('hidden');});
+  document.getElementById(id).classList.toggle('hidden');
+}
+document.addEventListener('click',()=>{document.querySelectorAll('.kebab-menu').forEach(m=>m.classList.add('hidden'));});
+
+async function histAction(id,action){
+  if(action==='delete' && !confirm('Delete this message from the list?'))return;
+  if(action==='cancelScheduled' && !confirm('Cancel this scheduled message?'))return;
+  try{
+    await fetch('/api/history',{method:'POST',headers:authHeaders(true),body:JSON.stringify({action,id})});
+    loadHistory();
+  }catch(e){}
+}
+// "Send again" — drop the message (and photo) into the Send box
+function reuse(id,kind){
+  const src = kind==='archive'?ARCHIVE:HISTORY;
+  const x=src.find(r=>r.id===id); if(!x)return;
+  document.getElementById('msg').value=x.message||''; updateCount();
+  if(x.mediaUrl){
+    attachedImageUrl=x.mediaUrl;
+    document.getElementById('attachPreview').innerHTML=
+      `<div class="attach-pill">📷 Photo attached <button onclick="clearPhoto()" title="Remove">✕</button></div>
+       <img class="thumb" src="${esc(x.mediaUrl)}">`;
+  }else{clearPhoto();}
+  // reset target to everyone; the gabbai re-chooses recipients
+  document.getElementById('targetSelect').value='all';
+  document.getElementById('scheduleToggle').checked=false; toggleSchedule();
+  showTab('send'); onTargetChange();
+  document.getElementById('msg').focus();
+}
+
+/* ---------- members ---------- */
+async function loadMembers(){
+  try{
+    const r=await fetch('/api/contacts',{headers:authHeaders()});
+    const d=await r.json();
+    if(d.ok){MEMBERS=d.contacts||[];renderMembers();}
+  }catch(e){}
+}
+function groupName(id){const g=GROUPS.find(x=>x.id===id);return g?g.name:'';}
+function renderMembers(){
+  document.getElementById('memCount').textContent=MEMBERS.length;
+  const canEdit = true;
+  fillBulkGroupSelect();
+  const el=document.getElementById('memberList');
+  el.innerHTML = MEMBERS.map((m,i)=>{
+    const chips=(m.groups||[]).map(gid=>`<span class="chip">${esc(groupName(gid))}</span>`).join('');
+    return `
+    <div class="m-row">
+      ${canEdit?`<input type="checkbox" class="msel" data-ph="${esc(m.phone)}" onchange="updateSel()">`:''}
+      <div class="m-name" id="nm-${i}">
+        <div class="nm">${esc(m.name)}</div>
+        <div class="ph">${esc(fmtPhone(m.phone))}</div>
+        ${chips?`<div class="grp">${chips}</div>`:''}
+      </div>
+      ${canEdit?`<button class="btn sm ghost" onclick="editName(${i})">Edit</button>`:''}
+    </div>`;}).join('') || '<div class="m-row">No members yet.</div>';
+  updateSel();
+}
+function checkAll(v){document.querySelectorAll('#memberList .msel').forEach(c=>c.checked=v);updateSel();}
+function selectedMemberPhones(){return [...document.querySelectorAll('#memberList .msel:checked')].map(c=>c.dataset.ph);}
+function updateSel(){
+  const n=selectedMemberPhones().length;
+  document.getElementById('selBar').classList.toggle('hidden',n===0);
+  document.getElementById('selCount').textContent=n;
+}
+function fillBulkGroupSelect(){
+  const sel=document.getElementById('bulkGroupSelect'); if(!sel)return;
+  sel.innerHTML = GROUPS.length
+    ? GROUPS.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')
+    : '<option value="">(no groups)</option>';
+}
+async function assignSelectedToGroup(){
+  const gid=document.getElementById('bulkGroupSelect').value;
+  const phones=selectedMemberPhones();
+  const note=document.getElementById('memberNote');note.innerHTML='';
+  if(!gid){note.innerHTML='<div class="note bad">Create a group first (Admin tab).</div>';return;}
+  if(!phones.length)return;
+  try{
+    for(const ph of phones){
+      const m=MEMBERS.find(x=>x.phone===ph); if(!m)continue;
+      const set=new Set(m.groups||[]); set.add(gid);
+      await fetch('/api/groups',{method:'POST',headers:authHeaders(true),
+        body:JSON.stringify({action:'setMemberGroups',phone:ph,groupIds:[...set]})});
+    }
+    note.innerHTML=`<div class="note ok">Added ${phones.length} member${phones.length===1?'':'s'} to the group.</div>`;
+    loadMembers();
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+}
+function editName(i){
+  const m=MEMBERS[i];
+  const box=document.getElementById('nm-'+i);
+  const groupChecks = GROUPS.map(g=>{
+    const on=(m.groups||[]).includes(g.id);
+    return `<label class="checkline"><input type="checkbox" class="gchk" data-gid="${g.id}" ${on?'checked':''}> ${esc(g.name)}</label>`;
+  }).join('');
+  box.innerHTML=`<input class="text" id="edit-${i}" value="${esc(m.name)}">
+    ${GROUPS.length?`<div style="margin-top:6px"><div class="fld">Groups</div>${groupChecks}</div>`:''}
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm" onclick="saveName(${i})">Save</button>
+      <button class="btn sm ghost" onclick="renderMembers()">Cancel</button>
+    </div>`;
+  document.getElementById('edit-'+i).focus();
+}
+async function saveName(i){
+  const val=document.getElementById('edit-'+i).value.trim();
+  const m=MEMBERS[i];
+  const gids=[...document.querySelectorAll('#nm-'+i+' .gchk:checked')].map(c=>c.dataset.gid);
+  try{
+    await fetch('/api/contacts',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'rename',phone:m.phone,name:val})});
+    if(GROUPS.length){
+      await fetch('/api/groups',{method:'POST',headers:authHeaders(true),
+        body:JSON.stringify({action:'setMemberGroups',phone:m.phone,groupIds:gids})});
+    }
+    loadMembers();
+  }catch(e){}
+}
+async function removeSelected(){
+  const phones=selectedMemberPhones();
+  if(!phones.length)return;
+  if(!confirm(`Remove ${phones.length} member${phones.length===1?'':'s'}?`))return;
+  const note=document.getElementById('memberNote');note.innerHTML='';
+  try{
+    const r=await fetch('/api/contacts',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'removeMany',phones})});
+    const d=await r.json();
+    if(d.ok){note.innerHTML=`<div class="note ok">Removed ${d.removed} member${d.removed===1?'':'s'}.</div>`;loadMembers();}
+    else{note.innerHTML=`<div class="note bad">${esc(d.error||'Failed.')}</div>`;}
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+}
+function showAddOne(){document.getElementById('addOneRow').classList.toggle('hidden');}
+async function addOne(){
+  const name=document.getElementById('addName').value.trim();
+  const phone=document.getElementById('addPhone').value.replace(/\D/g,'');
+  const note=document.getElementById('memberNote');note.innerHTML='';
+  if(!phone){note.innerHTML='<div class="note bad">Enter a phone number.</div>';return;}
+  try{
+    const r=await fetch('/api/contacts',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'add',name,phone})});
+    const d=await r.json();
+    if(d.ok){document.getElementById('addName').value='';document.getElementById('addPhone').value='';loadMembers();}
+    else{note.innerHTML=`<div class="note bad">${esc(d.error||'Failed.')}</div>`;}
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+}
+function handleFile(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const note=document.getElementById('memberNote');note.innerHTML='';
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    try{
+      const data=new Uint8Array(e.target.result);
+      const wb=XLSX.read(data,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      const parsed=[];
+      for(const row of rows){
+        const cells=row.map(c=>String(c).trim());
+        if(!cells.length)continue;
+        const joined=cells.join(' ').toLowerCase();
+        if(joined.includes('name')&&joined.includes('phone'))continue;
+        let phone='',nameParts=[];
+        for(const c of cells){
+          const digits=c.replace(/\D/g,'');
+          if(digits.length>=10 && !phone){phone=c;}
+          else if(c){nameParts.push(c);}
+        }
+        if(phone) parsed.push({name:nameParts.join(' '),phone});
+      }
+      if(!parsed.length){note.innerHTML='<div class="note bad">No valid rows found. Need a name and a phone per row.</div>';ev.target.value='';return;}
+      const r=await fetch('/api/contacts',{method:'POST',headers:authHeaders(true),
+        body:JSON.stringify({action:'bulk',rows:parsed})});
+      const d=await r.json();
+      if(d.ok){note.innerHTML=`<div class="note ok">Added ${d.added}, skipped ${d.skipped} (already on list), ${d.invalid} invalid.</div>`;loadMembers();}
+      else{note.innerHTML=`<div class="note bad">${esc(d.error||'Upload failed.')}</div>`;}
+    }catch(err){note.innerHTML='<div class="note bad">Could not read that file.</div>';}
+    ev.target.value='';
+  };
+  reader.readAsArrayBuffer(f);
+}
+
+/* ---------- groups (admin) ---------- */
+async function loadGroups(){
+  try{
+    const r=await fetch('/api/groups',{headers:authHeaders()});
+    const d=await r.json();
+    if(d.ok){GROUPS=d.groups||[];}
+  }catch(e){}
+}
+function renderGroupsAdmin(){
+  const el=document.getElementById('groupList');
+  el.innerHTML = GROUPS.map(g=>`
+    <div class="m-row">
+      <div class="m-name"><div class="nm">${esc(g.name)}</div></div>
+      <button class="btn sm ghost" onclick="renameGroupPrompt('${g.id}')">Rename</button>
+      <button class="btn sm danger" onclick="removeGroup('${g.id}')">Delete</button>
+    </div>`).join('') || '<div class="count">No groups yet.</div>';
+}
+async function addGroup(){
+  const name=document.getElementById('newGroupName').value.trim();
+  const note=document.getElementById('groupNote');note.innerHTML='';
+  if(!name){note.innerHTML='<div class="note bad">Enter a group name.</div>';return;}
+  try{
+    const r=await fetch('/api/groups',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'add',name})});
+    const d=await r.json();
+    if(d.ok){document.getElementById('newGroupName').value='';await loadGroups();renderGroupsAdmin();}
+    else{note.innerHTML=`<div class="note bad">${esc(d.error||'Failed.')}</div>`;}
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+}
+async function renameGroupPrompt(id){
+  const g=GROUPS.find(x=>x.id===id);
+  const name=prompt('Rename group:',g?g.name:'');
+  if(name===null)return;
+  try{
+    await fetch('/api/groups',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'rename',id,name:name.trim()})});
+    await loadGroups();renderGroupsAdmin();loadMembers();
+  }catch(e){}
+}
+async function removeGroup(id){
+  if(!confirm('Delete this group? Members stay, they just lose this group tag.'))return;
+  try{
+    await fetch('/api/groups',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'remove',id})});
+    await loadGroups();renderGroupsAdmin();loadMembers();
+  }catch(e){}
+}
+
+/* ---------- replies ---------- */
+let REPLY_THREADS=[];
+function memberName(ph){const m=MEMBERS.find(x=>x.phone===ph);return m&&m.name&&m.name!=='Member'?m.name:'';}
+function buildThreads(d){
+  const map=new Map(), handled=d.handled||{};
+  (d.replies||[]).forEach(x=>{ if(!map.has(x.phone)) map.set(x.phone,[]); map.get(x.phone).push(x); });
+  const threads=[...map.entries()].map(([phone,msgs])=>{
+    const last=msgs[0]; // newest first from the server
+    const open=(last.dir||'in')==='in' && last.at>(handled[phone]||0);
+    return {phone,msgs:msgs.slice().reverse(),open,lastAt:last.at};
+  });
+  threads.sort((a,b)=>(b.open-a.open)||(b.lastAt-a.lastAt));
+  return threads;
+}
+function setBadge(n){
+  const b=document.getElementById('replyBadge');
+  b.textContent=n; b.classList.toggle('hidden',!n);
+}
+async function refreshReplyBadge(){
+  try{
+    const r=await fetch('/api/replies',{headers:authHeaders()});
+    const d=await r.json(); setBadge(buildThreads(d).filter(t=>t.open).length);
+  }catch(e){}
+}
+async function loadReplies(){
+  const el=document.getElementById('replyList');
+  try{
+    const r=await fetch('/api/replies',{headers:authHeaders()});
+    const d=await r.json();
+    REPLY_THREADS=buildThreads(d);
+    setBadge(REPLY_THREADS.filter(t=>t.open).length);
+    el.innerHTML=REPLY_THREADS.map((t,i)=>`
+      <div class="thread ${t.open?'open':'done'}">
+        <div class="thread-head"><span class="nm">${esc(memberName(t.phone)||'Member')}</span>
+          <span class="ph">${esc(fmtPhone(t.phone))} · #${esc(t.phone.slice(-4))}</span>
+          ${t.open?'<span class="chip new">Needs answer</span>':'<span class="chip ok">Handled</span>'}
+          <span class="spacer"></span>
+          ${t.open?`<button class="btn sm ghost" onclick="markHandled(${i})">Mark as handled</button>`:''}
+          <button class="btn sm ghost" onclick="deleteThread(${i})">Delete</button></div>
+        ${t.msgs.slice(-20).map(m=>`<div class="bubble ${m.dir==='out'?'out':'in'}">${esc(m.body)}<span class="t">${m.dir==='out'?'Gabbai':'Member'} · ${when(m.at)}</span></div>`).join('')}
+        <textarea id="ans-${i}" placeholder="Type an answer..."></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn sm" onclick="sendAnswer(${i})">Send answer</button><span id="ansNote-${i}" class="count"></span></div>
+      </div>`).join('')||'<div class="count">No messages yet.</div>';
+  }catch(e){el.innerHTML='<div class="count">Could not load messages.</div>';}
+}
+async function markHandled(i){
+  const t=REPLY_THREADS[i];
+  await fetch('/api/replies',{method:'POST',headers:authHeaders(true),body:JSON.stringify({action:'handled',phone:t.phone})});
+  loadReplies();
+}
+async function sendAnswer(i){
+  const t=REPLY_THREADS[i]; const box=document.getElementById('ans-'+i); const note=document.getElementById('ansNote-'+i);
+  const msg=box.value.trim(); if(!msg){note.textContent='Write an answer first.';return;}
+  note.textContent='Sending...';
+  try{
+    const r=await fetch('/api/replies',{method:'POST',headers:authHeaders(true),body:JSON.stringify({action:'send',phone:t.phone,message:msg})});
+    const d=await r.json();
+    if(d.ok){loadReplies();}else{note.textContent=d.error||'Not sent.';}
+  }catch(e){note.textContent='Something went wrong.';}
+}
+async function deleteThread(i){
+  const t=REPLY_THREADS[i];
+  if(!confirm('Delete this conversation from the dashboard?'))return;
+  await fetch('/api/replies',{method:'POST',headers:authHeaders(true),body:JSON.stringify({action:'deleteThread',phone:t.phone})});
+  loadReplies();
+}
+
+/* ---------- settings (admin) + times (gabbai) ---------- */
+const ADMIN_FIELDS=['gabbaiNumber','timesZip','menuText','donateText','contactText','joinText','replyConfirmText'];
+const TIME_FIELDS=['timesOffText','minchaMinutesBefore','fixedMincha','fixedMaariv','timesText','timesFallbackText'];
+let SETTINGS={};
+function lockBox(id,locked){
+  const box=document.getElementById(id);
+  box.querySelectorAll('input,textarea,select').forEach(el=>el.disabled=locked);
+  box.querySelectorAll('.lk-edit').forEach(el=>el.classList.toggle('hidden',!locked));
+  box.querySelectorAll('.lk-save').forEach(el=>el.classList.toggle('hidden',locked));
+}
+function fill(fields){fields.forEach(k=>{const el=document.getElementById('set-'+k);if(el)el.value=SETTINGS[k]==null?'':SETTINGS[k];});}
+async function loadSettingsForm(){
+  try{
+    const r=await fetch('/api/settings',{headers:authHeaders()});
+    const d=await r.json(); SETTINGS=d.settings||{};
+  }catch(e){SETTINGS={};}
+  if(ROLE==='admin'){
+    fill(ADMIN_FIELDS);
+    document.getElementById('set-forwardToGabbai').checked=!!SETTINGS.forwardToGabbai;
+    lockBox('settingsBox',true);
+  }else{
+    fill(TIME_FIELDS);
+    document.getElementById('set-timesEnabled').checked=SETTINGS.timesEnabled!==false;
+    showTimesOn();
+    document.getElementById(SETTINGS.timesMode==='fixed'?'tmode-fixed':'tmode-auto').checked=true;
+    showTimeMode();
+    lockBox('timesBox',true);
+    renderSpecials();
+    const sd=document.getElementById('spDate'); if(!sd.value) sd.value=todayStr();
+  }
+}
+function showTimeMode(){
+  const fixed=document.getElementById('tmode-fixed').checked;
+  document.getElementById('tm-auto').classList.toggle('hidden',fixed);
+  document.getElementById('tm-fixed').classList.toggle('hidden',!fixed);
+}
+async function postSettings(body,noteId){
+  const note=document.getElementById(noteId);note.innerHTML='';
+  try{
+    const r=await fetch('/api/settings',{method:'POST',headers:authHeaders(true),body:JSON.stringify(body)});
+    const d=await r.json();
+    if(d.ok){SETTINGS=d.settings;note.innerHTML='<div class="note ok">Saved. Texts use it right away.</div>';return true;}
+    note.innerHTML=`<div class="note bad">${esc(d.error||'Failed.')}</div>`;
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+  return false;
+}
+async function saveSettingsForm(){
+  const body={}; ADMIN_FIELDS.forEach(k=>body[k]=document.getElementById('set-'+k).value);
+  body.forwardToGabbai=document.getElementById('set-forwardToGabbai').checked;
+  if(await postSettings(body,'settingsNote')){fill(ADMIN_FIELDS);lockBox('settingsBox',true);}
+}
+async function saveTimes(){
+  const body={}; TIME_FIELDS.forEach(k=>body[k]=document.getElementById('set-'+k).value);
+  body.timesMode=document.getElementById('tmode-fixed').checked?'fixed':'auto';
+  body.timesEnabled=document.getElementById('set-timesEnabled').checked;
+  if(body.timesMode==='auto') delete body.fixedMincha;
+  if(await postSettings(body,'timesNote')){fill(TIME_FIELDS);lockBox('timesBox',true);}
+}
+function showTimesOn(){
+  const on=document.getElementById('set-timesEnabled').checked;
+  document.getElementById('timesOnBox').classList.toggle('hidden',!on);
+  document.getElementById('timesOffBox').classList.toggle('hidden',on);
+}
+
+/* ---------- minyan count ---------- */
+let MN_TIMER=null, MN_ACTIVE=false;
+async function loadMinyan(){
+  const optsHtml='<option value="">Everyone</option>'+GROUPS.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('');
+  document.getElementById('mnGroup').innerHTML=optsHtml;
+  document.getElementById('mnSchedGroup').innerHTML=optsHtml;
+  if(!SETTINGS.minyanAskText){try{const r=await fetch('/api/settings',{headers:authHeaders()});SETTINGS=(await r.json()).settings||{};}catch(e){}}
+  document.getElementById('mnGoal').value=SETTINGS.minyanGoal||10;
+  document.getElementById('mnAsk').value=SETTINGS.minyanAskText||'';
+  document.getElementById('mnThanks').value=SETTINGS.minyanThanksText||'';
+  document.getElementById('mnSendThanks').checked=SETTINGS.minyanSendThanks!==false;
+  document.getElementById('mnThanksBox').classList.toggle('hidden',SETTINGS.minyanSendThanks===false);
+  document.getElementById('mnConfirm').value=SETTINGS.minyanConfirmText||'';
+  document.getElementById('mnEnabled').checked=!!SETTINGS.minyanEnabled;
+  const dateEl=document.getElementById('mnDate'); if(!dateEl.value) dateEl.value=todayStr();
+  const ss=document.getElementById('mnSchedStart'), se=document.getElementById('mnSchedEnd');
+  if(!ss.value) ss.value=todayStr();
+  if(!se.value) se.value=todayStr();
+  renderMinyanSchedules();
+  refreshMinyan();
+  clearInterval(MN_TIMER); MN_TIMER=setInterval(()=>{ if(!document.getElementById('view-times').classList.contains('hidden')) refreshMinyan(); },20000);
+}
+function renderMinyanSchedules(){
+  const list=SETTINGS.minyanSchedules||[];
+  const groupName=id=>id?((GROUPS.find(g=>g.id===id)||{}).name||'a group'):'Everyone';
+  document.getElementById('mnSchedList').innerHTML=list.map((x,i)=>`
+    <div class="sched-row"><b>${esc(x.tefila)}</b>
+      <span class="count">${esc(niceDate(x.startDate))} \u2192 ${esc(niceDate(x.endDate))} \u00b7 ${esc(groupName(x.groupId))}</span>
+      <span class="spacer"></span>
+      <button class="btn sm ghost" onclick="removeMinyanSchedule(${i})">Remove</button></div>`).join('')
+    ||'<div class="count">No auto-schedules set.</div>';
+}
+async function addMinyanSchedule(){
+  const tef=document.getElementById('mnSchedTefila').value;
+  const start=document.getElementById('mnSchedStart').value, end=document.getElementById('mnSchedEnd').value;
+  const groupId=document.getElementById('mnSchedGroup').value||null;
+  if(!start||!end){document.getElementById('mnNote').innerHTML='<div class="note bad">Pick a from and to date.</div>';return;}
+  if(end<start){document.getElementById('mnNote').innerHTML='<div class="note bad">The "to" date must be on or after the "from" date.</div>';return;}
+  const list=(SETTINGS.minyanSchedules||[]).slice();
+  list.push({tefila:tef,startDate:start,endDate:end,groupId});
+  if(await postSettings({minyanSchedules:list},'mnNote')) renderMinyanSchedules();
+}
+async function removeMinyanSchedule(i){
+  const list=(SETTINGS.minyanSchedules||[]).slice(); list.splice(i,1);
+  if(await postSettings({minyanSchedules:list},'mnNote')) renderMinyanSchedules();
+}
+async function refreshMinyan(){
+  const st=document.getElementById('mnStatus'), startBox=document.getElementById('mnStart');
+  try{
+    const r=await fetch('/api/minyan',{headers:authHeaders()}); const d=await r.json(); const c=d.call;
+    MN_ACTIVE=!!(c&&c.active);
+    if(!c){st.innerHTML='';startBox.classList.remove('hidden');return;}
+    const pct=Math.min(100,Math.round(c.total/c.goal*100));
+    st.innerHTML=`<div class="log-row">
+      <div class="row"><b style="font-size:22px">${esc(c.tefila)} ${esc(c.when)}: ${c.total} / ${c.goal}</b>
+        ${c.confirmedAt?'<span class="chip ok">Minyan! Everyone was texted</span>':(c.active?'<span class="chip">Counting…</span>':'<span class="chip new">Stopped</span>')}</div>
+      <div style="background:#eee;border-radius:6px;height:10px;margin:8px 0"><div style="width:${pct}%;background:var(--green);height:10px;border-radius:6px"></div></div>
+      <div class="count">Asked ${c.asked} people · started ${when(c.startedAt)}</div>
+      ${c.list.map(x=>`<div>${esc(x.name)} <span class="count">${esc(fmtPhone(x.phone))}</span> — <b>${x.count}</b></div>`).join('')||'<div class="count">No answers yet.</div>'}
+      <div class="row" style="margin-top:10px">
+        ${c.active&&!c.confirmedAt?`<button class="btn sm" onclick="minyanAction('confirmNow')">Send "we have a minyan" now</button>`:''}
+        ${c.active?`<button class="btn sm danger" onclick="minyanAction('stop')">Stop count</button>`:''}
+      </div></div>`;
+    startBox.classList.remove('hidden');
+  }catch(e){st.innerHTML='<div class="count">Could not load the count.</div>';}
+}
+async function startMinyan(){
+  const note=document.getElementById('mnNote'); note.innerHTML='';
+  const tef=document.getElementById('mnTefila').value, dt=document.getElementById('mnDate').value||todayStr();
+  if(!confirm('Send "who is coming to '+tef+' '+niceDate(dt)+'" to '+(document.getElementById('mnGroup').selectedOptions[0].text)+' now?'+(MN_ACTIVE?'\n\nThe count that is running now will be closed.':'')))return;
+  const ok=await postSettings({minyanGoal:document.getElementById('mnGoal').value,minyanAskText:document.getElementById('mnAsk').value,
+    minyanThanksText:document.getElementById('mnThanks').value,minyanSendThanks:document.getElementById('mnSendThanks').checked,minyanConfirmText:document.getElementById('mnConfirm').value},'mnNote');
+  if(!ok)return;
+  note.innerHTML='<div class="note ok">Sending…</div>';
+  try{
+    const r=await fetch('/api/minyan',{method:'POST',headers:authHeaders(true),body:JSON.stringify({action:'start',groupId:document.getElementById('mnGroup').value||null,tefila:tef,date:dt})});
+    const d=await r.json();
+    note.innerHTML=d.ok?`<div class="note ok">Question sent to ${d.sent} of ${d.total}.</div>`:`<div class="note bad">${esc(d.error||'Failed.')}</div>`;
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+  refreshMinyan();
+}
+async function minyanAction(action){
+  if(action==='stop'&&!confirm('Stop counting for today?'))return;
+  if(action==='confirmNow'&&!confirm('Text everyone that there is a minyan?'))return;
+  const note=document.getElementById('mnNote');
+  try{
+    const r=await fetch('/api/minyan',{method:'POST',headers:authHeaders(true),body:JSON.stringify({action})});
+    const d=await r.json(); note.innerHTML=d.ok?'<div class="note ok">Done.</div>':`<div class="note bad">${esc(d.error||'Failed.')}</div>`;
+  }catch(e){}
+  refreshMinyan();
+}
+
+function todayStr(){return new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});}
+function niceDate(ds){const [y,m,d]=ds.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
+function renderSpecials(){
+  const list=SETTINGS.specialTimes||[];
+  document.getElementById('spList').innerHTML=list.map((x,i)=>`
+    <div class="log-row"><div class="meta">${x.date===todayStr()?'<b>Today</b> · ':''}${esc(niceDate(x.date))}</div>
+      <div class="body-txt">${esc(x.text)}</div>
+      <button class="btn sm ghost" style="margin-top:8px" onclick="removeSpecial(${i})">Remove</button></div>`).join('')
+    ||'<div class="count">No special days set.</div>';
+}
+async function addSpecial(){
+  const date=document.getElementById('spDate').value, text=document.getElementById('spText').value.trim();
+  const note=document.getElementById('spNote');
+  if(!date||!text){note.innerHTML='<div class="note bad">Pick a date and write the message.</div>';return;}
+  const list=(SETTINGS.specialTimes||[]).filter(x=>x.date!==date).concat([{date,text}]);
+  if(await postSettings({specialTimes:list},'spNote')){document.getElementById('spText').value='';renderSpecials();}
+}
+async function removeSpecial(i){
+  const list=(SETTINGS.specialTimes||[]).slice(); list.splice(i,1);
+  if(await postSettings({specialTimes:list},'spNote')) renderSpecials();
+}
+
+/* ---------- admin: password ---------- */
+async function changeGabbaiPw(){
+  const np=document.getElementById('newGabbaiPw').value.trim();
+  const note=document.getElementById('adminNote');note.innerHTML='';
+  try{
+    const r=await fetch('/api/settings',{method:'POST',headers:authHeaders(true),
+      body:JSON.stringify({action:'setGabbaiPassword',newPassword:np})});
+    const d=await r.json();
+    if(d.ok){note.innerHTML='<div class="note ok">Gabbai password updated.</div>';document.getElementById('newGabbaiPw').value='';}
+    else{note.innerHTML=`<div class="note bad">${esc(d.error||'Failed.')}</div>`;}
+  }catch(e){note.innerHTML='<div class="note bad">Something went wrong.</div>';}
+}
+
+function esc(s){return String(s==null?'':s).replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));}
+function when(ts){const d=new Date(ts);return d.toLocaleString();}
+</script>
+<script>
+/* ---------- Gmail-style popups (replace all green/red banners) ---------- */
+function toastWrap(){
+  let w=document.getElementById('toastWrap');
+  if(!w){w=document.createElement('div');w.id='toastWrap';w.className='toast-wrap';document.body.appendChild(w);}
+  return w;
+}
+function showToast(text,kind,ms){
+  const t=document.createElement('div');
+  t.className='toast'+(kind==='bad'?' bad':'');
+  const span=document.createElement('span'); span.textContent=text; t.appendChild(span);
+  const x=document.createElement('button'); x.className='x'; x.textContent='✕'; x.onclick=()=>t.remove(); t.appendChild(x);
+  toastWrap().appendChild(t);
+  setTimeout(()=>t.remove(), ms || (kind==='bad'?7000:5000));
+  return t;
+}
+function undoCountdown(text){
+  return new Promise(resolve=>{
+    let done=false, left=5;
+    const t=document.createElement('div'); t.className='toast';
+    const span=document.createElement('span'); t.appendChild(span);
+    const u=document.createElement('button'); u.textContent='Undo'; t.appendChild(u);
+    const paint=()=>{span.textContent='Sending in '+left+' second'+(left===1?'':'s')+'…';};
+    paint(); toastWrap().appendChild(t);
+    const iv=setInterval(()=>{left--; if(left<=0){finish(true);} else paint();},1000);
+    function finish(go){ if(done)return; done=true; clearInterval(iv); t.remove(); resolve(go); }
+    u.onclick=()=>finish(false);
+  });
+}
+/* Any old-style banner that appears anywhere becomes a popup instead */
+new MutationObserver(muts=>{
+  muts.forEach(m=>m.addedNodes.forEach(n=>{
+    if(n.nodeType!==1)return;
+    const list = n.classList&&n.classList.contains('note') ? [n] : Array.from(n.querySelectorAll?n.querySelectorAll('.note'):[]);
+    list.forEach(el=>{
+      if(!(el.classList.contains('ok')||el.classList.contains('bad')))return;
+      const txt=el.textContent.trim();
+      const kind=el.classList.contains('bad')?'bad':'ok';
+      el.remove();
+      if(txt) showToast(txt,kind);
+    });
+  }));
+}).observe(document.documentElement,{childList:true,subtree:true});
+</script>
+<script>
+/* Phone numbers shown as (845) 662-2476 */
+function fmtPhone(p){
+  const d=String(p||'').replace(/\D/g,'');
+  const t = d.length===11&&d[0]==='1' ? d.slice(1) : d;
+  return t.length===10 ? '('+t.slice(0,3)+') '+t.slice(3,6)+'-'+t.slice(6) : String(p||'');
+}
+function typePhone(v){
+  let d=String(v||'').replace(/\D/g,'');
+  if(d.length===11&&d[0]==='1') d=d.slice(1);
+  d=d.slice(0,10);
+  if(d.length<4) return d;
+  if(d.length<7) return '('+d.slice(0,3)+') '+d.slice(3);
+  return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);
+}
+</script>
+</body>
+</html>
