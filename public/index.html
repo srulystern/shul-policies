@@ -172,6 +172,11 @@
   #wnModal.show{display:flex}
   #wnModal .box{background:#fff;border-radius:14px;max-width:640px;width:100%;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
   .wn-body{font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+  .wn-box{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:#fff}
+  .wn-box.is-new{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger) inset}
+  .wn-box .wn-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .wn-box .wn-title{font-weight:700;font-size:16px;color:var(--green-dark)}
+  .wn-box .wn-date{font-size:12px;color:var(--muted)}
   .wn-body img{display:block;max-width:100%;border-radius:8px;margin:10px 0;border:1px solid var(--line)}
   .wn-edit-wrap{position:relative}
   #wnEditor{min-height:220px;border:1px solid var(--line);border-radius:10px;padding:12px 110px 12px 12px;background:#fff;outline:none}
@@ -567,21 +572,28 @@
       </div>
 
       <div class="panel">
-        <h2>What's new</h2>
-        <p class="count" style="margin-top:-6px">The gabbai sees this when he presses <b>What's new</b> at the top. To add a photo: click at the end of a line, then press <b>+ Photo</b> next to it.</p>
-        <div class="row" style="margin-bottom:8px">
-          <button class="btn sm ghost" onmousedown="event.preventDefault()" onclick="wnPickPhoto()">📷 Add photo</button>
-          <span class="count" id="wnStatus"></span>
+        <div class="row" style="margin-bottom:6px"><h2 style="margin:0;flex:1">What's new</h2>
+          <button class="btn sm" id="wnAddBtn" onclick="wnStartEdit(null)">+ Add new update</button></div>
+        <p class="count" style="margin-top:0">Each update is its own box. The gabbai sees them when he presses <b>What's new</b> at the top - newest on top, with a red <b>New</b> tag until he opens it.</p>
+        <div id="wnForm" class="hidden" style="border:1px solid var(--green);border-radius:12px;padding:14px;margin-bottom:14px;background:#fafcfb">
+          <label class="fld">Title</label>
+          <input class="text" id="wnTitle" dir="auto" placeholder="Version 2.4">
+          <label class="fld" style="margin-top:10px">Text - to add a photo, click at the end of a line, then press <b>+ Photo</b> next to it</label>
+          <div class="row" style="margin-bottom:8px">
+            <button class="btn sm ghost" onmousedown="event.preventDefault()" onclick="wnPickPhoto()">📷 Add photo</button>
+            <span class="count" id="wnStatus"></span>
+          </div>
+          <div class="wn-edit-wrap">
+            <div id="wnEditor" contenteditable="true" dir="auto" data-ph="Paste the What's new text here..."></div>
+            <button class="btn sm" id="wnSideBtn" onmousedown="event.preventDefault()" onclick="wnPickPhoto()">+ Photo</button>
+          </div>
+          <input type="file" id="wnFile" accept="image/*" class="hidden" onchange="wnPhotoChosen(event)">
+          <div class="row" style="margin-top:12px">
+            <button class="btn" onclick="saveWhatsNew()">Save</button>
+            <button class="btn ghost" onclick="wnCancelEdit()">Cancel</button>
+          </div>
         </div>
-        <div class="wn-edit-wrap">
-          <div id="wnEditor" contenteditable="true" data-ph="Paste the What's new text here..."></div>
-          <button class="btn sm" id="wnSideBtn" onmousedown="event.preventDefault()" onclick="wnPickPhoto()">+ Photo</button>
-        </div>
-        <input type="file" id="wnFile" accept="image/*" class="hidden" onchange="wnPhotoChosen(event)">
-        <div class="row" style="margin-top:12px">
-          <button class="btn" onclick="saveWhatsNew()">Save What's new</button>
-          <button class="btn ghost" onclick="openWhatsNew()">Preview</button>
-        </div>
+        <div id="wnAdminList"></div>
         <div id="wnNote"></div>
       </div>
 
@@ -1566,32 +1578,87 @@ async function loadSettingsQuiet(){
   fillSubject(); checkWhatsNewDot();
 }
 
-/* ---------- What's new ---------- */
+/* ---------- What's new (one box per update) ---------- */
 function wnSeenKey(){return 'slWnSeen-'+(ROLE||'');}
+function wnSeen(){let v=0;try{v=Number(localStorage.getItem(wnSeenKey()))||0;}catch(e){}return v;}
+function wnList(){return SETTINGS.whatsNewList||[];}
 function checkWhatsNewDot(){
-  let seen=0; try{seen=Number(localStorage.getItem(wnSeenKey()))||0;}catch(e){}
-  const has=!!(SETTINGS.whatsNew||'').trim();
-  document.getElementById('wnBtn').classList.toggle('hidden',!has&&ROLE!=='admin');
-  document.getElementById('wnDot').classList.toggle('hidden',!(has&&(SETTINGS.whatsNewAt||0)>seen));
+  const list=wnList(), seen=wnSeen();
+  document.getElementById('wnBtn').classList.toggle('hidden',!list.length&&ROLE!=='admin');
+  document.getElementById('wnDot').classList.toggle('hidden',!list.some(x=>x.at>seen));
+}
+function wnBoxHtml(x,seen,admin,i){
+  const isNew=x.at>seen;
+  return `<div class="wn-box${isNew?' is-new':''}">
+    <div class="wn-head">
+      <span class="wn-title">${esc(x.title||"What's new")}</span>
+      ${isNew?'<span class="chip new">New</span>':''}
+      <span class="wn-date">${esc(new Date(x.at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}))}</span>
+      ${admin?`<span class="spacer" style="flex:1"></span>
+        <button class="btn sm ghost" onclick="wnStartEdit(${i})">Edit</button>
+        <button class="btn sm danger" onclick="wnDelete(${i})">Delete</button>`:''}
+    </div>
+    <div class="wn-body">${x.html||''}</div>
+  </div>`;
 }
 function openWhatsNew(){
-  let html = SETTINGS.whatsNew||'';
-  if(ROLE==='admin'&&document.getElementById('wnEditor')) html=document.getElementById('wnEditor').innerHTML;
-  document.getElementById('wnView').innerHTML = html.trim()?html:'<div class="count">Nothing here yet.</div>';
+  const list=wnList(), seen=wnSeen();
+  document.getElementById('wnView').innerHTML = list.length ? list.map(x=>wnBoxHtml(x,seen,false)).join('') : '<div class="count">Nothing here yet.</div>';
   document.getElementById('wnModal').classList.add('show');
-  try{localStorage.setItem(wnSeenKey(),String(SETTINGS.whatsNewAt||Date.now()));}catch(e){}
+  try{localStorage.setItem(wnSeenKey(),String(Math.max(Date.now(),SETTINGS.whatsNewAt||0)));}catch(e){}
   checkWhatsNewDot();
 }
 function closeWhatsNew(){document.getElementById('wnModal').classList.remove('show');}
-let WN_RANGE=null;
+function renderWnAdmin(){
+  const el=document.getElementById('wnAdminList'); if(!el)return;
+  const list=wnList();
+  el.innerHTML = list.length ? list.map((x,i)=>wnBoxHtml(x,Infinity,true,i)).join('') : '<div class="count">No updates yet. Press "+ Add new update".</div>';
+}
+let WN_EDIT=null; // index being edited, or null for a new box
 function loadWhatsNewEditor(){
+  renderWnAdmin();
   const ed=document.getElementById('wnEditor');
   if(!ed||ed.dataset.loaded)return;
-  ed.innerHTML=SETTINGS.whatsNew||''; ed.dataset.loaded='1';
+  ed.dataset.loaded='1';
   const track=()=>{ setTimeout(wnPlaceSideBtn,0); };
   ['keyup','mouseup','focus','input'].forEach(ev=>ed.addEventListener(ev,track));
   ed.addEventListener('blur',()=>setTimeout(()=>{ if(document.activeElement!==ed) document.getElementById('wnSideBtn').style.display='none'; },200));
 }
+function wnStartEdit(i){
+  WN_EDIT=i;
+  const x=i==null?{title:'',html:''}:wnList()[i];
+  document.getElementById('wnTitle').value=x.title||'';
+  document.getElementById('wnEditor').innerHTML=x.html||'';
+  document.getElementById('wnStatus').textContent='';
+  document.getElementById('wnForm').classList.remove('hidden');
+  document.getElementById('wnAddBtn').classList.add('hidden');
+  document.getElementById('wnForm').scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('wnTitle').focus();
+}
+function wnCancelEdit(){
+  WN_EDIT=null;
+  document.getElementById('wnForm').classList.add('hidden');
+  document.getElementById('wnAddBtn').classList.remove('hidden');
+  document.getElementById('wnSideBtn').style.display='none';
+}
+async function saveWhatsNew(){
+  const title=document.getElementById('wnTitle').value.trim();
+  const html=document.getElementById('wnEditor').innerHTML;
+  if(!title&&!document.getElementById('wnEditor').textContent.trim()&&!/<img/i.test(html)){
+    document.getElementById('wnNote').innerHTML='<div class="note bad">Write a title or some text first.</div>';return;
+  }
+  const list=wnList().map(x=>({...x}));
+  if(WN_EDIT==null) list.unshift({title,html});
+  else Object.assign(list[WN_EDIT],{title,html});
+  if(await postSettings({whatsNewList:list},'wnNote')){ wnCancelEdit(); renderWnAdmin(); checkWhatsNewDot(); }
+}
+async function wnDelete(i){
+  const x=wnList()[i]; if(!x)return;
+  if(!confirm('Delete the box "'+(x.title||"What's new")+'"?'))return;
+  const list=wnList().filter((_,j)=>j!==i);
+  if(await postSettings({whatsNewList:list},'wnNote')){ if(WN_EDIT!=null) wnCancelEdit(); renderWnAdmin(); checkWhatsNewDot(); }
+}
+let WN_RANGE=null;
 // Show "+ Photo" next to the line where the cursor is
 function wnPlaceSideBtn(){
   const ed=document.getElementById('wnEditor'), btn=document.getElementById('wnSideBtn');
@@ -1647,10 +1714,6 @@ async function wnPhotoChosen(ev){
     const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(after); WN_RANGE=after.cloneRange();
     ed.focus(); st.textContent='Photo added. Press Save when done.';
   }catch(e){st.textContent='Upload failed.';}
-}
-async function saveWhatsNew(){
-  const html=document.getElementById('wnEditor').innerHTML;
-  if(await postSettings({whatsNew:html},'wnNote')){ document.getElementById('wnEditor').innerHTML=SETTINGS.whatsNew||''; }
 }
 
 /* ---------- date & time boxes: click anywhere opens the pop-up calendar / clock ---------- */

@@ -34,8 +34,8 @@ export const DEFAULT_SETTINGS = {
   callerMessage: 'You have reached Congregation Lake Shore. This number is for text messages only. Please text the word MENU to see what you can do. Thank you.',
   gabbaiReplyPrefix: 'Gabbai:',   // put at the start of every answer the gabbai sends a member
   subjectLine: 'בית המדרש לעיק שאור', // first line of every message sent from the dashboard (gabbai can change)
-  whatsNew: '',               // "What's new" page (admin writes it; text + photos)
-  whatsNewAt: 0,              // when it was last changed (gabbai sees a dot until he opens it)
+  whatsNewList: [],           // "What's new" boxes, newest first: [{ id, title, html, at }] (admin writes them; text + photos)
+  whatsNewAt: 0,              // when the newest box was added (gabbai sees a dot until he opens it)
   timesZip: '10950',
   timesEnabled: true,         // gabbai can turn TIMES off (e.g. winter)
   timesOffText: 'Cong. Lake Shore - davening times by text are not available right now.',
@@ -135,9 +135,23 @@ export async function saveSettings(patch) {
       next[k] = n;
     } else if (k === 'whatsNewAt') {
       continue; // set by itself below
-    } else if (k === 'whatsNew') {
-      const clean = cleanWhatsNew(patch[k]);
-      if (clean !== current.whatsNew) { next.whatsNew = clean; next.whatsNewAt = Date.now(); }
+    } else if (k === 'whatsNewList') {
+      const old = new Map((current.whatsNewList || []).map(x => [x.id, x]));
+      const list = Array.isArray(patch[k]) ? patch[k] : [];
+      next[k] = list
+        .filter(x => x && (String(x.title || '').trim() || cleanWhatsNew(x.html).replace(/<br>/g, '').trim()))
+        .slice(0, 60)
+        .map(x => {
+          const prev = old.get(x.id);
+          return {
+            id: prev ? prev.id : (Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+            title: String(x.title || '').trim().slice(0, 80),
+            html: cleanWhatsNew(x.html),
+            at: prev ? prev.at : Date.now(), // editing a box doesn't make it "New" again
+          };
+        })
+        .sort((a, b) => b.at - a.at);
+      next.whatsNewAt = next[k].reduce((m, x) => Math.max(m, x.at), 0);
     } else if (k === 'subjectLine') {
       next[k] = String(patch[k]).trim().slice(0, 80);
     } else if (k === 'shmaOpinion') {
